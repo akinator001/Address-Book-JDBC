@@ -1,6 +1,7 @@
 package com.cp.addressbookjdbc;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,4 +25,19 @@ public class AddressBookTest {
     	Assert.assertEquals("agra", contact.city);
     }
 	
+	@Test
+    public void givenContactsData_WhenCountByCity_ShouldReturnProperValue() {
+    	AddressBookService addBookService = new AddressBookService();
+    	addBookService.readAddresBookData(IOService.DB_IO);
+    	Map<String, Integer> countContactsByCity = addBookService.readCountContactsByCity(IOService.DB_IO);
+    	Assert.assertTrue(countContactsByCity.get("bangalore").equals(1) && countContactsByCity.get("panipat").equals(1) && countContactsByCity.get("greater noida").equals(1) && countContactsByCity.get("agra").equals(1));
+    }
+
+	@Test
+    public void givenContactsData_WhenCountByState_ShouldReturnProperValue() {
+    	AddressBookService addBookService = new AddressBookService();
+    	addBookService.readAddresBookData(IOService.DB_IO);
+    	Map<String, Integer> countContactsByState = addBookService.readCountContactsByState(IOService.DB_IO);
+    	Assert.assertTrue(countContactsByState.get("karnataka").equals(1) && countContactsByState.get("haryana").equals(2) && countContactsByState.get("up").equals(1));
+    }
 }

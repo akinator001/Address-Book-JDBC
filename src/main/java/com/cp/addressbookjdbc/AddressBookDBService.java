@@ -1,13 +1,17 @@
 package com.cp.addressbookjdbc;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AddressBookDBService {
 	private static AddressBookDBService addBookDB;
@@ -107,5 +111,41 @@ public class AddressBookDBService {
 			e.printStackTrace();
 		}
 		return 0;
+	}
+	
+	public Map<String, Integer> getCountByCity() {
+		String sql = "SELECT city, COUNT(city) AS count_city FROM addressbook GROUP BY city";
+		Map<String, Integer> cityToContactsMap = new HashMap<>();
+		try(Connection connection = this.getConnection()) {
+			Statement statement = connection.createStatement();
+			ResultSet result = statement.executeQuery(sql);
+			while(result.next()) {
+				String city = result.getString("city");
+				int count = result.getInt("count_city");
+				cityToContactsMap.put(city, count);
+			}
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return cityToContactsMap;
+	}
+
+	public Map<String, Integer> getCountByState() {
+		String sql = "SELECT state, COUNT(state) AS count_state FROM addressbook GROUP BY state";
+		Map<String, Integer> stateToContactsMap = new HashMap<>();
+		try(Connection connection = this.getConnection()) {
+			Statement statement = connection.createStatement();
+			ResultSet result = statement.executeQuery(sql);
+			while(result.next()) {
+				String state = result.getString("state");
+				int count = result.getInt("count_state");
+				stateToContactsMap.put(state, count);
+			}
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return stateToContactsMap;
 	}
 }
