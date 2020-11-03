@@ -45,6 +45,22 @@ public class AddressBookDBService {
 		return addBookList;
 	}
 
+	public List<AddressBookData> getAddressBookData(String firstName) {
+		List<AddressBookData> addBookList = null;
+		if(this.addBookDataStatement == null) {
+			this.prepareStatementForEmployeeData();
+		}
+		try {
+			addBookDataStatement.setString(1, firstName);
+			ResultSet result = addBookDataStatement.executeQuery();
+			addBookList = this.getAddressBookData(result);
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return addBookList;
+	}
+	
 	private List<AddressBookData> getAddressBookData(ResultSet result) {
 		List<AddressBookData> addressBookList = new ArrayList<>();
 		try {
@@ -64,5 +80,32 @@ public class AddressBookDBService {
 			e.printStackTrace();
 		}
 		return addressBookList;
+	}
+	
+	private void prepareStatementForEmployeeData() {
+		try {
+			Connection connection = this.getConnection();
+			String sql = "SELECT * FROM addressbook WHERE first_name = ?";
+			addBookDataStatement = connection.prepareStatement(sql);
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public int updateData(String firstName, String city) {
+		return this.updateAddressBookDataUsingStatement(firstName, city);
+	}
+
+	private int updateAddressBookDataUsingStatement(String firstName, String city) {
+		String sql = String.format("update addressbook set city = %s where first_name = %s", city, firstName);
+		try(Connection connection = this.getConnection()) {
+			Statement statement = connection.createStatement();
+			return statement.executeUpdate(sql);
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
 	}
 }
