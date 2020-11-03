@@ -1,6 +1,7 @@
 package com.cp.addressbookjdbc;
 
 import java.util.List;
+import java.util.Map;
 
 public class AddressBookService {
 	public enum IOService {
@@ -38,5 +39,19 @@ public class AddressBookService {
 				  .filter(con -> con.firstName.equals(firstName))
 				  .findFirst()
 				  .orElse(null);
+	}
+	
+	public Map<String, Integer> readCountContactsByCity(IOService ioService) {
+		if(ioService.equals(IOService.DB_IO)) {
+			return addBookDB.getCountByCity();
+		}
+		return null;
+	}
+
+	public Map<String, Integer> readCountContactsByState(IOService ioService) {
+		if(ioService.equals(IOService.DB_IO)) {
+			return addBookDB.getCountByState();
+		}
+		return null;
 	}
 }
