@@ -1,19 +1,19 @@
 package com.cp.addressbookjdbc;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class AddressBookDBService {
+	private int connectionCounter = 0;
+	
 	private static AddressBookDBService addBookDB;
 	private PreparedStatement addBookDataStatement;
 
@@ -27,11 +27,14 @@ public class AddressBookDBService {
 	}
 
 	private Connection getConnection() throws SQLException {
+		connectionCounter++;
 		String jdbcURL = "jdbc:mysql://localhost:3306/addressbook_service?allowPublicKeyRetrieval=true&&useSSL=false";
 		String userName = "root";
 		String password = "Aakash@123";
 		Connection connection;
+		System.out.println("Processing Thread : " + Thread.currentThread().getName() + "Connecting to database with Id : " + connectionCounter);
 		connection = DriverManager.getConnection(jdbcURL, userName, password);
+		System.out.println("Processing Thread : " + Thread.currentThread().getName() + "Connecting to database with Id : " + connectionCounter + "Connection is successful!");
 		return connection;
 	}
 
@@ -149,9 +152,9 @@ public class AddressBookDBService {
 		return stateToContactsMap;
 	}
 	
-	public AddressBookData addContactToBook(String firstName, String lastName, String address, String city, String state, String zipcode, String phone, String email) {
+	public AddressBookData addContactToBook(String firstName, String lastName, String address, String city, String state, String zip, String phone, String email) {
 		AddressBookData addBookData = null;
-		String sql = String.format("INSERT INTO addressbook (first_name, last_name, address, city, state, zip, phone, email) VALUES ('%s', %s, '%s', '%s', '%s', %s, '%s', '%s')", firstName, lastName, address, city, state, zipcode, phone, email);
+		String sql = String.format("INSERT INTO addressbook (first_name, last_name, address, city, state, zip, phone, email) VALUES ('%s', %s, '%s', '%s', '%s', %s, '%s', '%s')", firstName, lastName, address, city, state, zip, phone, email);
 		try(Connection connection = this.getConnection()) {
 			Statement statement = connection.createStatement();
 			int rowAffected = statement.executeUpdate(sql, statement.RETURN_GENERATED_KEYS);
@@ -159,11 +162,12 @@ public class AddressBookDBService {
 				ResultSet result = statement.getGeneratedKeys();
 				if(result.next())	firstName = result.getString("first_name");
 			}
-			addBookData = new AddressBookData(firstName, lastName, address, city, state, zipcode, phone, email);
+			addBookData = new AddressBookData(firstName, lastName, address, city, state, zip, phone, email);
 		}
 		catch(SQLException e) {
 			e.printStackTrace();
 		}
 		return addBookData;
 	}
+	
 }
