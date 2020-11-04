@@ -23,9 +23,9 @@ public class AddressBookTest {
     public void givenNewCity_WhenUpdated_shouldMatchWithDB() {
     	AddressBookService addBookService = new AddressBookService();
     	addBookService.readAddresBookData(IOService.DB_IO);
-    	addBookService.updateContactsCity("nik","agra");
-    	AddressBookData contact = addBookService.checkAddressBookDataInSyncWithDB("nik");
-    	Assert.assertEquals("agra", contact.city);
+    	addBookService.updateContactsCity("nik", "agra", IOService.DB_IO);
+    	boolean result = addBookService.checkAddressBookDataInSyncWithDB("nik");
+    	Assert.assertTrue(result);
     }
 	
 	@Test
@@ -49,8 +49,8 @@ public class AddressBookTest {
     	AddressBookService addBookService = new AddressBookService();
     	addBookService.readAddresBookData(IOService.DB_IO);
     	addBookService.addContactToBook("ankit","pandey", "ct", "patna", "bihar", "700055", "9191919191", "ankit@gmail.com");
-    	AddressBookData contact = addBookService.checkAddressBookDataInSyncWithDB("ankit");
-    	Assert.assertEquals("ankit@gmail.com", contact.email);
+    	boolean result = addBookService.checkAddressBookDataInSyncWithDB("ankit");
+    	Assert.assertTrue(result);
     }
 	
 	@Test 

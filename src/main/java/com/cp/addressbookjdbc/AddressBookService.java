@@ -27,19 +27,19 @@ public class AddressBookService {
 		return this.addBookList;
 	}
 
-	public void updateContactsCity(String firstName, String city) {
-		int result = addBookDB.updateData(firstName, city);
-		if(result == 0)	return;
-		AddressBookData addBookData = this.checkAddressBookDataInSyncWithDB(firstName);
+	public void updateContactsCity(String firstName, String city, IOService ioService) {
+		if(ioService.equals(IOService.REST_IO)) {
+			int result = addBookDB.updateData(firstName, city);
+			if(result == 0)	return;
+		}
+		AddressBookData addBookData = this.getContactsData(firstName);
 		if(addBookData != null)	addBookData.city = city;
 	}
-
-	public AddressBookData checkAddressBookDataInSyncWithDB(String firstName) {
+	
+	public boolean checkAddressBookDataInSyncWithDB(String firstName) {
 		List<AddressBookData> addBookDataList = addBookDB.getAddressBookData(firstName);
-		return addBookDataList.stream()
-				  .filter(con -> con.firstName.equals(firstName))
-				  .findFirst()
-				  .orElse(null);
+		return addBookDataList.get(0).equals(getContactsData(firstName));
+
 	}
 	
 	public Map<String, Integer> readCountContactsByCity(IOService ioService) {
@@ -78,6 +78,25 @@ public class AddressBookService {
 				Thread.sleep(10);
 			}
 			catch(InterruptedException e) {}
+		}
+	}
+	
+	public AddressBookData getContactsData(String name) {
+		AddressBookData addBookData;
+		addBookData = this.addBookList.stream().filter(con -> con.firstName.equals(name))
+											  .findFirst()
+											  .orElse(null);
+		return addBookData;
+	}
+
+	public long countEntries(IOService ioService) {
+		return addBookList.size();
+	}
+
+	public void deleteEmployeeFromPayroll(String name, IOService ioService) {
+		if(ioService.equals(IOService.REST_IO)) {
+			AddressBookData addBookData = this.getContactsData(name);
+			addBookList.remove(addBookData);
 		}
 	}
 	
