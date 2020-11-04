@@ -1,5 +1,8 @@
 package com.cp.addressbookjdbc;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -45,8 +48,27 @@ public class AddressBookTest {
     public void givenNewContact_WhenAdded_ShouldSyncWithDB() {
     	AddressBookService addBookService = new AddressBookService();
     	addBookService.readAddresBookData(IOService.DB_IO);
-    	addBookService.addContactToBook("ankit", "pandey", "ct", "patna", "Bihar", "700055", "9191919191", "ankit@gmail.com");
+    	addBookService.addContactToBook("ankit","pandey", "ct", "patna", "bihar", "700055", "9191919191", "ankit@gmail.com");
     	AddressBookData contact = addBookService.checkAddressBookDataInSyncWithDB("ankit");
     	Assert.assertEquals("ankit@gmail.com", contact.email);
     }
+	
+	@Test 
+    public void given3Contacts_WhenAdded_ShouldMatchContactsCount() {
+    	AddressBookData[] addBookData = {
+    			new AddressBookData("strot", "Paliya", "army colony","chandigarh", "punjab", "700066", "9123912391", "strot@gmail.com"),
+    			new AddressBookData("sandeep", "dhaka", "Amazon","gurugram", "haryana", "700023", "9156912391", "sandeep@gmail.com"),
+    			new AddressBookData("kanishka", "Mukherjee", "saket","mount abu", "rajasthan", "700044", "9128712391", "kani@gmail.com"),
+    	};
+    	AddressBookService addBookService = new AddressBookService();
+    	addBookService.readAddresBookData(IOService.DB_IO);
+    	Instant threadStart = Instant.now();
+    	addBookService.addContactsWithThreads(Arrays.asList(addBookData));
+    	Instant threadEnd = Instant.now();
+    	System.out.println("Duration with thread : " + Duration.between(threadStart, threadEnd));
+    	List<AddressBookData> addressBookData = addBookService.readAddresBookData(IOService.DB_IO);
+    	System.out.println(addressBookData.size());
+    	Assert.assertEquals(4, addressBookData.size());
+    }
+	
 }

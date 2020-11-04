@@ -1,5 +1,6 @@
 package com.cp.addressbookjdbc;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,4 +59,26 @@ public class AddressBookService {
 	public void addContactToBook(String firstName, String lastName, String  address, String city, String state, String zipcode, String phone, String email) {
 		addBookList.add(addBookDB.addContactToBook(firstName, lastName, address, city, state, zipcode, phone, email));
 	}
+	
+	public void addContactsWithThreads(List<AddressBookData> addBookList) {
+		Map<Integer, Boolean> contactAdditionStatus = new HashMap<Integer, Boolean>();
+		addBookList.forEach(addBookData -> {
+			Runnable task = () -> {
+				contactAdditionStatus.put(addBookData.hashCode(), false);
+				System.out.println("Employee being added : " + Thread.currentThread().getName());
+				this.addContactToBook(addBookData.firstName, addBookData.lastName, addBookData.address, addBookData.city, addBookData.state, addBookData.zipcode, addBookData.phone, addBookData.email);
+				contactAdditionStatus.put(addBookData.hashCode(), true);
+				System.out.println("Employee added : " + Thread.currentThread().getName());
+			};
+			Thread thread = new Thread(task, addBookData.firstName);
+			thread.start();
+		});
+		while(contactAdditionStatus.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			}
+			catch(InterruptedException e) {}
+		}
+	}
+	
 }
